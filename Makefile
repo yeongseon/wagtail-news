@@ -1,19 +1,47 @@
-init: load-data start
+.PHONY: init venv install migrate superuser run load-data reset dbshell lint test clean commit
 
-start:
-	python ./manage.py runserver
+PYTHON=python
+VENV_DIR=venv
+ACTIVATE=. $(VENV_DIR)/bin/activate;
+
+init: venv install migrate superuser run
+
+venv:
+	test -d $(VENV_DIR) || $(PYTHON) -m venv $(VENV_DIR)
+
+install:
+	$(ACTIVATE) pip install --upgrade pip
+	$(ACTIVATE) pip install -r requirements.txt || pip install wagtail
+
+migrate:
+	$(ACTIVATE) python manage.py migrate
+
+superuser:
+	$(ACTIVATE) python manage.py createsuperuser
+
+run:
+	$(ACTIVATE) python manage.py runserver
 
 load-data:
-	python ./manage.py createcachetable
-	python ./manage.py migrate
-	python ./manage.py load_initial_data
-	python ./manage.py collectstatic --noinput
+	$(ACTIVATE) python manage.py load_initial_data || true
 
-dump-data:
-	python ./manage.py dumpdata --natural-foreign --indent 2 -e auth.permission -e contenttypes -e wagtailcore.GroupCollectionPermission -e wagtailimages.rendition -e images.rendition -e sessions -e wagtailsearch.indexentry -e wagtailsearch.sqliteftsindexentry -e wagtailcore.referenceindex -e wagtailcore.pagesubscription > fixtures/demo.json
-
-reset-db:
+reset:
 	rm -f db.sqlite3
-	python ./manage.py createcachetable
-	python ./manage.py migrate
-	python ./manage.py load_initial_data
+	make migrate
+	make load-data
+
+dbshell:
+	$(ACTIVATE) python manage.py dbshell
+
+lint:
+	$(ACTIVATE) flake8 .
+
+test:
+	$(ACTIVATE) python manage.py test
+
+clean:
+	rm -rf __pycache__ */__pycache__ *.pyc *.pyo *.sqlite3 $(VENV_DIR)
+
+commit:
+	git add .
+	git commit -m "$(m)"
