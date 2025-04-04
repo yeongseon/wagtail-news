@@ -45,3 +45,8 @@ clean:
 commit:
 	git add .
 	git commit -m "$(m)"
+
+format:
+	$(ACTIVATE) black .
+	$(ACTIVATE) isort .
+
