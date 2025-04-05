@@ -1,24 +1,30 @@
 from .base import *  # noqa
+import os
+import dj_database_url
 
 DEBUG = False
 
+# 자동 감지된 Azure 호스트 or fallback
+ALLOWED_HOSTS = [os.getenv("WEBSITE_HOSTNAME", "localhost")]
 
-# Security configuration
+SECRET_KEY = os.getenv("SECRET_KEY")
 
-# Ensure that the session cookie is only sent by browsers under an HTTPS connection.
-# https://docs.djangoproject.com/en/stable/ref/settings/#session-cookie-secure
+DATABASES = {
+    "default": dj_database_url.config(conn_max_age=600)
+}
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+
+DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
+AZURE_ACCOUNT_NAME = os.getenv("AZURE_ACCOUNT_NAME")
+AZURE_ACCOUNT_KEY = os.getenv("AZURE_ACCOUNT_KEY")
+AZURE_CONTAINER = os.getenv("AZURE_CONTAINER", "media")
+
 SESSION_COOKIE_SECURE = True
-
-# Ensure that the CSRF cookie is only sent by browsers under an HTTPS connection.
-# https://docs.djangoproject.com/en/stable/ref/settings/#csrf-cookie-secure
 CSRF_COOKIE_SECURE = True
-
-# Allow the redirect importer to work in load-balanced / cloud environments.
-# https://docs.wagtail.io/en/v2.13/reference/settings.html#redirects
-WAGTAIL_REDIRECTS_FILE_STORAGE = "cache"
-
-# Force HTTPS redirect (enabled by default!)
 SECURE_SSL_REDIRECT = True
-
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = "no-referrer-when-downgrade"
+
+WAGTAIL_REDIRECTS_FILE_STORAGE = "cache"
