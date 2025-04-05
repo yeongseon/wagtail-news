@@ -42,15 +42,16 @@ This will:
 | `make install`   | Install required packages |
 | `make migrate`   | Apply Django migrations |
 | `make run`       | Run the development server |
-| `make start`     | Alias for `make run` |
 | `make superuser` | Create a Django superuser |
 | `make load-data` | Load initial data (requires `migrate` first) |
-| `make dump-data` | Dump database into `fixtures/demo.json` |
 | `make reset`     | Reset the database (delete `db.sqlite3`, re-setup) |
 | `make test`      | Run Django tests |
 | `make lint`      | Run flake8 for code linting |
+| `make format`    | Format code using black and isort |
 | `make commit`    | Add and commit all changes to Git |
 | `make clean`     | Remove venv, cache, and local DB |
+| `make az-install`| Install Azure CLI (macOS/Linux only) |
+| `make provision` | Create Azure resources using `provision_azure_resources.sh` |
 
 ---
 
@@ -74,7 +75,62 @@ SECRET_KEY=your-secret-key
 DATABASE_URL=sqlite:///db.sqlite3
 ```
 
-(Optional) You can also enable `.env` support via `python-dotenv` or `python-decouple`.
+For provisioning Azure infrastructure, create a `.env.azure` file:
+
+```bash
+cp .env.azure.example .env.azure
+```
+
+```env
+POSTGRES_USER=adminuser
+POSTGRES_PASSWORD=YourStrongPassword!123
+```
+
+Never commit `.env.azure` to Git. It should be added to `.gitignore`.
+
+---
+
+## ☁️ Provision Azure Infrastructure
+
+You can provision all necessary Azure resources (App Service, PostgreSQL, Blob Storage) using the built-in script:
+
+### 1. Prepare `.env.azure`
+
+Create the environment file:
+
+```bash
+cp .env.azure.example .env.azure
+```
+
+Then set your actual values in `.env.azure`:
+
+```env
+POSTGRES_USER=adminuser
+POSTGRES_PASSWORD=YourStrongPassword!123
+```
+
+Make sure `.env.azure` is in `.gitignore` and **never committed**.
+
+### 2. Install Azure CLI (if needed)
+
+```bash
+make az-install
+```
+
+> macOS and Linux are supported. For Windows, install Azure CLI manually.
+
+### 3. Provision the resources
+
+```bash
+make provision
+```
+
+This script will:
+
+- Create a resource group `wagtail-news-rg`
+- Create a Linux App Service plan and Web App (`wagtail-news-app`)
+- Create a PostgreSQL Flexible Server (burstable B1ms)
+- Create a Blob Storage account and media container
 
 ---
 
