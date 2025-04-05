@@ -1,14 +1,14 @@
 from django.conf import settings
+from django.core.paginator import Paginator
 from django.db import models
 from django.db.models.functions import Coalesce
-from django.core.paginator import Paginator
-from wagtail.admin.panels import FieldPanel, HelpPanel, InlinePanel, MultiFieldPanel
-from wagtail.fields import RichTextField
+from wagtail.admin.panels import (FieldPanel, HelpPanel, InlinePanel,
+                                  MultiFieldPanel)
+from wagtail.fields import RichTextField, StreamField
 from wagtail.search import index
 
-from wagtail.fields import StreamField
-from myproject.utils.models import BasePage, ArticleTopic
-from myproject.utils.blocks import ImageBlock, StoryBlock, FeaturedArticleBlock
+from myproject.utils.blocks import FeaturedArticleBlock, ImageBlock, StoryBlock
+from myproject.utils.models import ArticleTopic, BasePage
 
 
 class ArticlePage(BasePage):
@@ -82,20 +82,15 @@ class NewsListingPage(BasePage):
     subpage_types = ["news.ArticlePage"]
     max_count = 1  # Allow only one news listing page to keep article pages in one place
 
-    introduction = RichTextField(
-        blank=True, features=["bold", "italic", "link"]
-    )
+    introduction = RichTextField(blank=True, features=["bold", "italic", "link"])
 
     search_fields = BasePage.search_fields + [index.SearchField("introduction")]
 
-    content_panels = (
-        BasePage.content_panels
-        + [
-            FieldPanel("introduction"),
-            # FieldPanel("featured_card"),
-            HelpPanel("This page will automatically display child Article pages."),
-        ]
-    )
+    content_panels = BasePage.content_panels + [
+        FieldPanel("introduction"),
+        # FieldPanel("featured_card"),
+        HelpPanel("This page will automatically display child Article pages."),
+    ]
 
     def paginate_queryset(self, queryset, request):
         """Paginate the queryset."""
@@ -109,7 +104,6 @@ class NewsListingPage(BasePage):
             page = paginator.page(paginator.num_pages)
         return (paginator, page, page.object_list, page.has_other_pages())
 
-
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
         queryset = (
@@ -122,9 +116,12 @@ class NewsListingPage(BasePage):
             .order_by("-date")
         )
 
-        article_topics = ArticleTopic.objects.filter(
-            article_pages__isnull=False
-        ).values("title", "slug").distinct().order_by("title")
+        article_topics = (
+            ArticleTopic.objects.filter(article_pages__isnull=False)
+            .values("title", "slug")
+            .distinct()
+            .order_by("title")
+        )
         matching_topic = False
 
         topic_query_param = request.GET.get("topic")
@@ -133,7 +130,6 @@ class NewsListingPage(BasePage):
         ):
             matching_topic = topic_query_param
             queryset = queryset.filter(topic__slug=topic_query_param)
-
 
         # Paginate article pages
         paginator, page, _object_list, is_paginated = self.paginate_queryset(

@@ -1,10 +1,10 @@
-from PIL import ImageOps
 from django.db import models
 from django.utils.safestring import mark_safe
+from PIL import ImageOps
 from wagtail import hooks
-from wagtail.search import index
-from wagtail.images.models import AbstractImage, AbstractRendition, Image
 from wagtail.images.image_operations import FilterOperation
+from wagtail.images.models import AbstractImage, AbstractRendition, Image
+from wagtail.search import index
 
 
 class CustomImage(AbstractImage):
@@ -21,11 +21,11 @@ class CustomImage(AbstractImage):
         ),
     )
 
-    admin_form_fields = Image.admin_form_fields + (
-        "alternative_text",
-    )
+    admin_form_fields = Image.admin_form_fields + ("alternative_text",)
 
-    search_fields = AbstractImage.search_fields + [index.SearchField("alternative_text")]
+    search_fields = AbstractImage.search_fields + [
+        index.SearchField("alternative_text")
+    ]
 
 
 class Rendition(AbstractRendition):

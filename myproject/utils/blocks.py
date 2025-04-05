@@ -133,9 +133,7 @@ class FeaturedArticleBlock(blocks.StructBlock):
 
 class BaseSectionBlock(blocks.StructBlock):
     heading = blocks.CharBlock(
-        form_classname="title",
-        icon="title",
-        required=True
+        form_classname="title", icon="title", required=True
     )  # Should use H2s only
     sr_only_label = blocks.BooleanBlock(
         required=False,
@@ -150,9 +148,7 @@ class BaseSectionBlock(blocks.StructBlock):
 
 class StatisticSectionBlock(BaseSectionBlock):
     statistics = blocks.ListBlock(
-        SnippetChooserBlock(
-            "utils.Statistic"
-        ),
+        SnippetChooserBlock("utils.Statistic"),
         max_num=3,
         min_num=3,
     )
@@ -163,11 +159,7 @@ class StatisticSectionBlock(BaseSectionBlock):
 
 
 class CTASectionBlock(blocks.StructBlock):
-    heading = blocks.CharBlock(
-        form_classname="title",
-        icon="title",
-        required=True
-    )
+    heading = blocks.CharBlock(form_classname="title", icon="title", required=True)
     link = LinkStreamBlock()
     description = blocks.TextBlock(required=False)
 
@@ -184,6 +176,7 @@ class BaseCardSectionBlock(BaseSectionBlock):
         min_num=3,
         label="Card",
     )
+
     class Meta:
         abstract = True
         icon = "form"

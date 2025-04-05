@@ -6,7 +6,7 @@ from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
 from wagtail.fields import StreamField
 from wagtail.snippets.blocks import SnippetChooserBlock
 
-from myproject.utils.blocks import LinkStreamBlock, InternalLinkBlock
+from myproject.utils.blocks import InternalLinkBlock, LinkStreamBlock
 
 
 @register_setting(icon="list-ul")
@@ -15,16 +15,18 @@ class NavigationSettings(BaseSiteSetting, ClusterableModel):
         [("link", InternalLinkBlock())],
         blank=True,
         help_text="Main site navigation",
-        
     )
     footer_navigation = StreamField(
-        [("link_section", blocks.StructBlock([
-                ("section_heading", blocks.CharBlock()),
-                ("links", LinkStreamBlock(
-                    label = "Links", 
-                    max_num = None
-                )),
-            ])) 
+        [
+            (
+                "link_section",
+                blocks.StructBlock(
+                    [
+                        ("section_heading", blocks.CharBlock()),
+                        ("links", LinkStreamBlock(label="Links", max_num=None)),
+                    ]
+                ),
+            )
         ],
         blank=True,
     )

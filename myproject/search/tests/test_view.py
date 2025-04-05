@@ -1,7 +1,6 @@
 from django.conf import settings
-from django.test import override_settings
+from django.test import TestCase, override_settings
 from wagtail.models import Site
-from django.test import TestCase
 
 from myproject.home.models import HomePage
 
