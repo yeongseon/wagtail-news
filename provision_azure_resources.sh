@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Provision Azure resources for wagtail-news project
+# Provision Azure resources for kpn-news project
 
 # Load environment variables (POSTGRES_USER, POSTGRES_PASSWORD)
 if [ -f .env.azure ]; then
@@ -11,13 +11,13 @@ else
 fi
 
 # Variables
-RESOURCE_GROUP="wagtail-news-rg"
+RESOURCE_GROUP="kpn-news-rg"
 LOCATION="koreacentral"
-APP_NAME="wagtail-news-app"
-PLAN_NAME="wagtail-news-plan"
-STORAGE_ACCOUNT="wagtailnewsstorage"
+APP_NAME="kpn-news-app"
+PLAN_NAME="kpn-news-plan"
+STORAGE_ACCOUNT="kpnnewsstorage"
 CONTAINER_NAME="media"
-POSTGRES_NAME="wagtailnewsdb"
+POSTGRES_NAME="kpnnewsdb"
 
 # Check if resource group already exists
 if az group show --name $RESOURCE_GROUP &>/dev/null; then

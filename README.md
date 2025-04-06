@@ -1,6 +1,6 @@
-# wagtail-news
+# kpn-news
 
-A Wagtail-based news site starter template.
+A KPN-branded Wagtail-based news site starter template.
 
 This project provides a preconfigured Wagtail site with example pages, styles, and layout components suitable for news publishing.
 
@@ -11,8 +11,8 @@ This project provides a preconfigured Wagtail site with example pages, styles, a
 ### 1. Clone the project
 
 ```bash
-git clone https://github.com/yeongseon/wagtail-news.git
-cd wagtail-news
+git clone https://github.com/yeongseon/kpn-news.git
+cd kpn-news
 ```
 
 ### 2. Initialize development environment
@@ -127,8 +127,8 @@ make provision
 
 This script will:
 
-- Create a resource group `wagtail-news-rg`
-- Create a Linux App Service plan and Web App (`wagtail-news-app`)
+- Create a resource group `kpn-news-rg`
+- Create a Linux App Service plan and Web App (`kpn-news-app`)
 - Create a PostgreSQL Flexible Server (burstable B1ms)
 - Create a Blob Storage account and media container
 
