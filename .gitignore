@@ -1,20 +1,39 @@
-__pycache__
-*.pyc
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# macOS
 .DS_Store
+
+# Editor / IDE
+.vscode/
+.idea/
 *.swp
-.env
-*.sqlite3
-/venv/
-/.venv/
-/tmp/
-/static/
-/.vagrant/
-/Vagrantfile.local
-node_modules/
-/npm-debug.log
-/.idea/
-.vscode
-coverage
 .python-version
-.vim
-.env.azure
+.vim/
+
+# Virtualenv
+venv/
+.venv/
+
+# Django
+*.sqlite3
+staticfiles/
+media/
+tmp/
+
+# Environment
+.env
+.env.*
+
+# Node
+node_modules/
+npm-debug.log
+
+# Vagrant
+.vagrant/
+Vagrantfile.local
+
+# Test coverage
+coverage/
