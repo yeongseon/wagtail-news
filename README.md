@@ -55,16 +55,6 @@ This will:
 
 ---
 
-## ⚠️ Notes
-
-- **Run `make migrate` before `make load-data`**  
-  The `load_initial_data` command expects the database tables to already exist.  
-  Running it too early will cause `OperationalError: no such table: wagtailcore_site`.
-
-- If no `requirements.txt` exists, `wagtail` will be installed directly.
-
----
-
 ## 🔐 Environment Variables
 
 You can use a `.env` file to configure your environment:
@@ -96,20 +86,11 @@ You can provision all necessary Azure resources (App Service, PostgreSQL, Blob S
 
 ### 1. Prepare `.env.azure`
 
-Create the environment file:
-
 ```bash
 cp .env.azure.example .env.azure
 ```
 
-Then set your actual values in `.env.azure`:
-
-```env
-POSTGRES_USER=adminuser
-POSTGRES_PASSWORD=YourStrongPassword!123
-```
-
-Make sure `.env.azure` is in `.gitignore` and **never committed**.
+Then set your actual values in `.env.azure`.
 
 ### 2. Install Azure CLI (if needed)
 
@@ -117,27 +98,74 @@ Make sure `.env.azure` is in `.gitignore` and **never committed**.
 make az-install
 ```
 
-> macOS and Linux are supported. For Windows, install Azure CLI manually.
-
 ### 3. Provision the resources
 
 ```bash
 make provision
 ```
 
-This script will:
+---
 
-- Create a resource group `kpn-news-rg`
-- Create a Linux App Service plan and Web App (`kpn-news-app`)
-- Create a PostgreSQL Flexible Server (burstable B1ms)
-- Create a Blob Storage account and media container
+## 🔧 Post-Deployment Setup (Production)
+
+After deploying to Azure App Service, you must perform additional setup to complete production configuration.
+
+### ✅ 1. Configure Environment Variables in Azure
+
+Go to **Azure Portal → App Service → Configuration → Application Settings**, and add the following:
+
+| Name               | Value (Example)                                                                 |
+|--------------------|----------------------------------------------------------------------------------|
+| `DATABASE_URL`     | `postgres://adminuser:MyPassword@mydb.postgres.database.azure.com:5432/mydb`    |
+| `SECRET_KEY`       | `your-very-secret-django-key`                                                    |
+| `AZURE_ACCOUNT_NAME` | Your Azure Storage account name                                                |
+| `AZURE_ACCOUNT_KEY`  | Your Azure Storage account access key                                          |
+| `AZURE_CONTAINER`    | `media` (or other name you used)                                               |
+
+#### 🔍 How to retrieve Azure Storage environment variables
+
+You can retrieve storage-related environment variables using the Azure CLI:
+
+```bash
+# Set your variables
+RESOURCE_GROUP=kpn-news-rg
+STORAGE_ACCOUNT=kpnnewsstorage
+
+# Get Azure Storage Account Name
+export AZURE_ACCOUNT_NAME=$STORAGE_ACCOUNT
+
+# Get Azure Storage Account Key
+export AZURE_ACCOUNT_KEY=$(az storage account keys list \
+  --resource-group $RESOURCE_GROUP \
+  --account-name $STORAGE_ACCOUNT \
+  --query "[0].value" -o tsv)
+
+# Set container name (default: media)
+export AZURE_CONTAINER=media
+```
+
+You can then add these values to `.env.azure` manually or through the Azure Portal.
 
 ---
 
-## 🔧 Post-Deployment Setup
+### ✅ 2. Database Configuration
 
-After deployment (e.g., via GitHub Actions to Azure), run the following management commands
-from the App Service SSH console or a local shell connected to the environment:
+The production config uses `dj_database_url`:
+
+```python
+DATABASES = {
+    "default": dj_database_url.config(conn_max_age=600)
+}
+```
+
+It reads `DATABASE_URL` from the environment.  
+Make sure the variable is set properly in App Service.
+
+If not set, Django may fall back to using the local `sqlite3` database, which is **not recommended in production**.
+
+### ✅ 3. Run Production Commands
+
+After deployment, run the following commands **inside the Azure App Service** (via SSH or App Console):
 
 ```bash
 python manage.py migrate
@@ -145,52 +173,7 @@ python manage.py collectstatic --noinput
 python manage.py createsuperuser
 ```
 
-These are required to initialize your database and admin panel for production.
-
----
-
-## 🗂 Project Structure
-
-This project contains both backend and frontend code. Here's how the codebase is organized:
-
-```
-.
-├── myproject/              # Django/Wagtail backend application
-│   ├── home/               # Homepage app
-│   ├── news/               # News app
-│   └── ...
-├── static_src/             # Tailwind, JS, and frontend source files
-├── static_compiled/        # Compiled frontend assets (output by Webpack)
-├── templates/              # Jinja/Django templates
-├── node_modules/           # Installed Node packages (auto-generated)
-├── package.json            # Node project config for Tailwind/Webpack
-├── tailwind.config.js      # Tailwind CSS config
-├── webpack.config.js       # Webpack bundler config
-├── manage.py               # Django entry point
-├── requirements.txt        # Python dependencies
-├── Makefile                # Setup, linting, deployment scripts
-└── provision_azure_resources.sh # Azure resource setup script
-```
-
----
-
-## ⚙️ Technologies Used
-
-| Layer      | Tech Stack                     |
-|------------|--------------------------------|
-| Backend    | Python, Django, Wagtail        |
-| Frontend   | Tailwind CSS, Webpack, JS      |
-| Deployment | Azure App Service, PostgreSQL, Blob Storage |
-| Dev Tools  | Make, GitHub Actions, Codespaces |
-
----
-
-## 🧭 How They Work Together
-
-- The backend serves content and logic using Django and Wagtail.
-- The frontend assets are authored using Tailwind CSS and compiled via Webpack.
-- Compiled assets are collected with Django's `collectstatic` and served from Azure Blob Storage in production.
-- You can provision infrastructure using the included shell script and deploy automatically using GitHub Actions.
+You can also automate these steps using GitHub Actions `post-deploy` steps if needed.
 
 ---
 
