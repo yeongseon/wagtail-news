@@ -127,14 +127,16 @@ Go to **Azure Portal → App Service → Configuration → Application Settings*
 You can retrieve storage-related environment variables using the Azure CLI:
 
 ```bash
-# Set your variables
-RESOURCE_GROUP=kpn-news-rg
-STORAGE_ACCOUNT=kpnnewsstorage
+# Sample: Set your Azure Storage environment variables
 
-# Get Azure Storage Account Name
+# Replace these with your actual resource names
+RESOURCE_GROUP=your-resource-group
+STORAGE_ACCOUNT=yourstorageaccount
+
+# Set Azure Storage account name
 export AZURE_ACCOUNT_NAME=$STORAGE_ACCOUNT
 
-# Get Azure Storage Account Key
+# Retrieve the access key for the storage account
 export AZURE_ACCOUNT_KEY=$(az storage account keys list \
   --resource-group $RESOURCE_GROUP \
   --account-name $STORAGE_ACCOUNT \
