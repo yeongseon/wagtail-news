@@ -134,6 +134,21 @@ This script will:
 
 ---
 
+## 🔧 Post-Deployment Setup
+
+After deployment (e.g., via GitHub Actions to Azure), run the following management commands
+from the App Service SSH console or a local shell connected to the environment:
+
+```bash
+python manage.py migrate
+python manage.py collectstatic --noinput
+python manage.py createsuperuser
+```
+
+These are required to initialize your database and admin panel for production.
+
+---
+
 ## 📦 License
 
 [BSD 3-Clause License](LICENSE)
