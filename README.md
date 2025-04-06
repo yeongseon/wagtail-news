@@ -149,6 +149,51 @@ These are required to initialize your database and admin panel for production.
 
 ---
 
+## 🗂 Project Structure
+
+This project contains both backend and frontend code. Here's how the codebase is organized:
+
+```
+.
+├── myproject/              # Django/Wagtail backend application
+│   ├── home/               # Homepage app
+│   ├── news/               # News app
+│   └── ...
+├── static_src/             # Tailwind, JS, and frontend source files
+├── static_compiled/        # Compiled frontend assets (output by Webpack)
+├── templates/              # Jinja/Django templates
+├── node_modules/           # Installed Node packages (auto-generated)
+├── package.json            # Node project config for Tailwind/Webpack
+├── tailwind.config.js      # Tailwind CSS config
+├── webpack.config.js       # Webpack bundler config
+├── manage.py               # Django entry point
+├── requirements.txt        # Python dependencies
+├── Makefile                # Setup, linting, deployment scripts
+└── provision_azure_resources.sh # Azure resource setup script
+```
+
+---
+
+## ⚙️ Technologies Used
+
+| Layer      | Tech Stack                     |
+|------------|--------------------------------|
+| Backend    | Python, Django, Wagtail        |
+| Frontend   | Tailwind CSS, Webpack, JS      |
+| Deployment | Azure App Service, PostgreSQL, Blob Storage |
+| Dev Tools  | Make, GitHub Actions, Codespaces |
+
+---
+
+## 🧭 How They Work Together
+
+- The backend serves content and logic using Django and Wagtail.
+- The frontend assets are authored using Tailwind CSS and compiled via Webpack.
+- Compiled assets are collected with Django's `collectstatic` and served from Azure Blob Storage in production.
+- You can provision infrastructure using the included shell script and deploy automatically using GitHub Actions.
+
+---
+
 ## 📦 License
 
 [BSD 3-Clause License](LICENSE)
