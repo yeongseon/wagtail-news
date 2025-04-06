@@ -20,13 +20,15 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m venv venv
-          . venv/bin/activate
           pip install -r requirements.txt
 
-      - name: Deploy to Azure Web App
+      - name: Create ZIP package for Azure deployment
+        run: |
+          zip -r release.zip . -x "venv/*" "*.git*" "*__pycache__*" "*.pyc" "*.pyo"
+
+      - name: Deploy to Azure Web App (zip deploy)
         uses: azure/webapps-deploy@v2
         with:
           app-name: kpn-news-app
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: .
+          package: release.zip
