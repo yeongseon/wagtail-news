@@ -18,13 +18,17 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install dependencies
+      - name: Install dependencies into site_packages/
         run: |
-          pip install -r requirements.txt
+          pip install -r requirements.txt --target site_packages
+
+      - name: Copy installed packages to root
+        run: |
+          cp -r site_packages/* .
 
       - name: Create ZIP package for Azure deployment
         run: |
-          zip -r release.zip . -x "venv/*" "*.git*" "*__pycache__*" "*.pyc" "*.pyo"
+          zip -r release.zip . -x "site_packages/*" "venv/*" "*.git*" "*__pycache__*" "*.pyc" "*.pyo"
 
       - name: Deploy to Azure Web App (zip deploy)
         uses: azure/webapps-deploy@v2
