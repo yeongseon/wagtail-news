@@ -65,6 +65,7 @@ module.exports = {
             '10xl': ['100px', '1.2'],
         },
         fontFamily: {
+            sans: ['"Noto Sans KR"', 'sans-serif'],
             sans3: ["'Source Sans 3', sans-serif"],
             serif4: ["'Source Serif 4', serif"],
             codepro: ["'Source Code Pro', monospace"],
