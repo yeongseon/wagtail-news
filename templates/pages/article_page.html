@@ -65,7 +65,22 @@
 
   <!-- Rich Body -->
   <section class="px-6 md:px-20 max-w-3xl mx-auto pb-20 prose prose-lg prose-slate">
-    {{ page.body|richtext }}
+    {% for block in page.body %}
+      {% if block.block_type == 'rich_text' %}
+        <div class="rich-text">
+          {{ block.value|richtext }}
+        </div>
+      {% elif block.block_type == 'image' %}
+        <div class="pb-10 md:pb-20 flex justify-center">
+          {% image block.value width-640 %}
+          {% if block.value.caption %}
+            <p class="mt-4">{{ block.value.caption }}</p>
+          {% endif %}
+        </div>
+      {% elif block.block_type == 'paragraph' %}
+        <p>{{ block.value }}</p>
+      {% endif %}
+    {% endfor %}
   </section>
 
   <!-- Related Articles -->

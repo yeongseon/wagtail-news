@@ -1,12 +1,10 @@
-
 {% load wagtailimages_tags %}
 
 <div class="pb-10 md:pb-20 flex justify-center">
     <div>
         {% image value.image width-640 %}
         {% if value.caption %}
-            <p class="mt-4">{{ value.caption }}</p>
+            <p class="mt-4 text-mackerel-800 dark:text-mackerel-200">{{ value.caption }}</p>
         {% endif %}
     </div>
 </div>
-

@@ -1,12 +1,11 @@
-
 {% load wagtailcore_tags %}
 
 {% include "components/streamfield/blocks/heading2_block.html" with large_spacing=True value=value.heading sr_only=value.sr_only_label %}
 
-
-<div class="flex flex-col md:flex-row gap-20">
+<div class="flex flex-col md:flex-row gap-20 bg-white text-black dark:bg-black dark:text-white p-6 rounded-md shadow-md">
     {% for card in value.cards %}
-        {% include_block card %}
+        <div class="w-full md:w-auto">
+            {% include_block card %}
+        </div>
     {% endfor %}
 </div>
-

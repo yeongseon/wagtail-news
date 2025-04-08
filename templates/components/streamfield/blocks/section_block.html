@@ -1,9 +1,11 @@
-
 {% load wagtailcore_tags %}
 
-{% include "components/streamfield/blocks/heading2_block.html" with value=value.heading %}
+<div class="pb-10 md:pb-20">
+    {% include "components/streamfield/blocks/heading2_block.html" with value=value.heading %}
 
-{% for block in value.content %}
-    {% include_block block %}
-{% endfor %}
-
+    <div class="flex flex-col gap-10">
+        {% for block in value.content %}
+            {% include_block block %}
+        {% endfor %}
+    </div>
+</div>
