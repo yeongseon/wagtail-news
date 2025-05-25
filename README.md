@@ -25,33 +25,36 @@ make init
 
 This will:
 
-- Create a Python virtual environment
-- Install dependencies
-- Run database migrations
-- Create a superuser
-- Start the development server
+* Create a Python virtual environment
+* Install dependencies
+* Run database migrations
+* Create a superuser
+* Start the development server
 
 ---
 
 ## 🛠 Makefile Commands
 
-| Command           | Description |
-|------------------|-------------|
-| `make init`      | Full setup: venv → install → migrate → superuser → runserver |
-| `make venv`      | Create a virtual environment (`venv/`) |
-| `make install`   | Install required packages |
-| `make migrate`   | Apply Django migrations |
-| `make run`       | Run the development server |
-| `make superuser` | Create a Django superuser |
-| `make load-data` | Load initial data (requires `migrate` first) |
-| `make reset`     | Reset the database (delete `db.sqlite3`, re-setup) |
-| `make test`      | Run Django tests |
-| `make lint`      | Run flake8 for code linting |
-| `make format`    | Format code using black and isort |
-| `make commit`    | Add and commit all changes to Git |
-| `make clean`     | Remove venv, cache, and local DB |
-| `make az-install`| Install Azure CLI (macOS/Linux only) |
-| `make provision` | Create Azure resources using `provision_azure_resources.sh` |
+| Command                 | Description                                                        |
+| ----------------------- | ------------------------------------------------------------------ |
+| `make init`             | Full setup: venv → install → migrate → superuser → runserver       |
+| `make venv`             | Create a virtual environment (`venv/`)                             |
+| `make install`          | Install required packages                                          |
+| `make migrate`          | Apply Django migrations                                            |
+| `make run`              | Run the development server                                         |
+| `make superuser`        | Create a Django superuser                                          |
+| `make load-data`        | Load initial data (requires `migrate` first)                       |
+| `make reset`            | Reset the database (delete `db.sqlite3`, re-setup)                 |
+| `make test`             | Run Django tests                                                   |
+| `make lint`             | Run flake8 for code linting                                        |
+| `make format`           | Format code using black and isort                                  |
+| `make commit`           | Add and commit all changes to Git (use: `make commit m="message"`) |
+| `make clean`            | Remove venv, cache, and local DB                                   |
+| `make az-install`       | Install Azure CLI (macOS/Linux only)                               |
+| `make provision`        | Create Azure resources using `provision_azure_resources.sh`        |
+| `make collectstatic`    | Collect static files for production                                |
+| `make createcachetable` | Create DB cache table for cache backend                            |
+| `make deploy`           | Run production deployment steps: migrate + collectstatic           |
 
 ---
 
@@ -76,7 +79,7 @@ POSTGRES_USER=adminuser
 POSTGRES_PASSWORD=YourStrongPassword!123
 ```
 
-Never commit `.env.azure` to Git. It should be added to `.gitignore`.
+> Never commit `.env.azure` to Git. It should be added to `.gitignore`.
 
 ---
 
@@ -114,39 +117,29 @@ After deploying to Azure App Service, you must perform additional setup to compl
 
 Go to **Azure Portal → App Service → Configuration → Application Settings**, and add the following:
 
-| Name               | Value (Example)                                                                 |
-|--------------------|----------------------------------------------------------------------------------|
-| `DATABASE_URL`     | `postgres://adminuser:MyPassword@mydb.postgres.database.azure.com:5432/mydb`    |
-| `SECRET_KEY`       | `your-very-secret-django-key`                                                    |
-| `AZURE_ACCOUNT_NAME` | Your Azure Storage account name                                                |
-| `AZURE_ACCOUNT_KEY`  | Your Azure Storage account access key                                          |
-| `AZURE_CONTAINER`    | `media` (or other name you used)                                               |
+| Name                 | Value (Example)                                                              |
+| -------------------- | ---------------------------------------------------------------------------- |
+| `DATABASE_URL`       | `postgres://adminuser:MyPassword@mydb.postgres.database.azure.com:5432/mydb` |
+| `SECRET_KEY`         | `your-very-secret-django-key`                                                |
+| `AZURE_ACCOUNT_NAME` | Your Azure Storage account name                                              |
+| `AZURE_ACCOUNT_KEY`  | Your Azure Storage account access key                                        |
+| `AZURE_CONTAINER`    | `media` (or other name you used)                                             |
 
 #### 🔍 How to retrieve Azure Storage environment variables
 
-You can retrieve storage-related environment variables using the Azure CLI:
-
 ```bash
-# Sample: Set your Azure Storage environment variables
-
-# Replace these with your actual resource names
 RESOURCE_GROUP=your-resource-group
 STORAGE_ACCOUNT=yourstorageaccount
 
-# Set Azure Storage account name
 export AZURE_ACCOUNT_NAME=$STORAGE_ACCOUNT
-
-# Retrieve the access key for the storage account
 export AZURE_ACCOUNT_KEY=$(az storage account keys list \
   --resource-group $RESOURCE_GROUP \
   --account-name $STORAGE_ACCOUNT \
   --query "[0].value" -o tsv)
-
-# Set container name (default: media)
 export AZURE_CONTAINER=media
 ```
 
-You can then add these values to `.env.azure` manually or through the Azure Portal.
+Then add these values to `.env.azure` or through the Azure Portal.
 
 ---
 
@@ -160,10 +153,9 @@ DATABASES = {
 }
 ```
 
-It reads `DATABASE_URL` from the environment.  
-Make sure the variable is set properly in App Service.
+Make sure the `DATABASE_URL` variable is set in your environment. If not, Django may fall back to using SQLite, which is **not suitable for production**.
 
-If not set, Django may fall back to using the local `sqlite3` database, which is **not recommended in production**.
+---
 
 ### ✅ 3. Run Production Commands
 
@@ -175,7 +167,25 @@ python manage.py collectstatic --noinput
 python manage.py createsuperuser
 ```
 
-You can also automate these steps using GitHub Actions `post-deploy` steps if needed.
+Or you can automate these using GitHub Actions `post-deploy` steps.
+
+---
+
+## 🧰 Admin Login for Development
+
+To access the Django Admin interface in development:
+
+* URL: [http://localhost:8000/admin/](http://localhost:8000/admin/)
+* Username: `testadmin`
+* Password: `DjangoTest123!`
+
+> This account is only for local development. Do **not** use weak credentials in production.
+
+Create the user manually or via:
+
+```bash
+make superuser
+```
 
 ---
 
